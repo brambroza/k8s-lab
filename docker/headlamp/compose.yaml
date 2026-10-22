@@ -1,0 +1,18 @@
+services:
+  headlamp:
+    image: ${HEADLAMP_IMAGE:?Set HEADLAMP_IMAGE in .env}
+    container_name: headlamp
+    restart: unless-stopped
+    user: "0:0"
+    entrypoint: ["/headlamp/headlamp-server"]
+    command:
+      - "-kubeconfig=/kubeconfig"
+      - "-html-static-dir=/headlamp/frontend"
+      - "-plugins-dir=/headlamp/plugins"
+    ports:
+      - "127.0.0.1:4466:4466"
+    volumes:
+      - type: bind
+        source: ${KUBECONFIG_PATH:?Set absolute KUBECONFIG_PATH in .env}
+        target: /kubeconfig
+        read_only: true

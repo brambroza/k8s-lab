@@ -1,0 +1,32 @@
+# PUBLIC TEMPLATE: replace TEST-NET IP 192.0.2.10 and example node name before init.
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: InitConfiguration
+localAPIEndpoint:
+  advertiseAddress: 192.0.2.10
+  bindPort: 6443
+nodeRegistration:
+  name: lab-control-plane
+  criSocket: unix:///run/containerd/containerd.sock
+  kubeletExtraArgs:
+    - name: node-ip
+      value: "192.0.2.10"
+---
+apiVersion: kubeadm.k8s.io/v1beta4
+kind: ClusterConfiguration
+kubernetesVersion: v1.35.9
+networking:
+  podSubnet: 10.244.0.0/16
+  serviceSubnet: 10.96.0.0/12
+apiServer:
+  certSANs:
+    - "192.0.2.10"
+    - "lab-control-plane"
+  extraArgs:
+    - name: feature-gates
+      value: MutatingAdmissionPolicy=true
+    - name: runtime-config
+      value: admissionregistration.k8s.io/v1beta1=true
+---
+apiVersion: kubelet.config.k8s.io/v1beta1
+kind: KubeletConfiguration
+cgroupDriver: systemd
